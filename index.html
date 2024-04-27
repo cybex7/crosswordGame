@@ -1,0 +1,78 @@
+    <div id="crossword-container"></div>
+    <button onclick="checkAnswers()">Check Answers</button> 
+<style>
+  /* styles.css */
+#crossword-container {
+    display: grid;
+    grid-template-columns: repeat(10, 30px);
+    grid-template-rows: repeat(10, 30px);
+    gap: 5px;
+}
+
+input {
+    width: 28px;
+    height: 28px;
+    font-size: 16px;
+    text-align: center;
+    text-transform: uppercase;
+    border: 1px solid #ccc;
+}
+
+input.non-playable {
+    background-color: black;
+    pointer-events: none;  /* Disables the cell from being selectable */
+}
+</style>
+<script>
+  // script.js
+const crosswordContainer = document.getElementById('crossword-container');
+const gridSize = 10; // 10x10 grid
+const crosswordData = {
+    1: { word: "ایران", start: [0,0], direction: "across" },
+    2: { word: "یراحی", start: [0,1], direction: "down" },
+    3: { word: "حر", start: [3,1], direction: "across" },
+    4: { word: "آرش", start: [4,4], direction: "down" }
+};
+
+function createGrid() {
+    for (let i = 0; i < gridSize; i++) {
+        for (let j = 0; j < gridSize; j++) {
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.maxLength = 1;
+            input.dataset.row = i;
+            input.dataset.col = j;
+            input.classList.add('non-playable');  // Assume cell is non-playable initially
+            crosswordContainer.appendChild(input);
+        }
+    }
+
+    // Set playable cells and mark them
+    for (const key in crosswordData) {
+        const { word, start, direction } = crosswordData[key];
+        for (let i = 0; i < word.length; i++) {
+            const rowIndex = start[0] + (direction === "across" ? 0 : i);
+            const colIndex = start[1] + (direction === "across" ? i : 0);
+            const cell = document.querySelector(`input[data-row='${rowIndex}'][data-col='${colIndex}']`);
+            cell.dataset.correct = word[i].toUpperCase();
+            cell.classList.remove('non-playable');
+        }
+    }
+}
+
+function checkAnswers() {
+    document.querySelectorAll('input').forEach(input => {
+        if (input.classList.contains('non-playable')) {
+            return;  // Ignore non-playable cells
+        }
+        if (input.value.toUpperCase() === input.dataset.correct) {
+            input.style.backgroundColor = 'lightgreen';
+        } else if (input.value !== '') {
+            input.style.backgroundColor = 'salmon';
+        }
+    });
+}
+
+createGrid();
+
+</script>
